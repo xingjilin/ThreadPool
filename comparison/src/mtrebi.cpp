@@ -27,8 +27,9 @@ nTest::duration test_mtrebi_init_and_dtor(unsigned long cnt)
 nTest::duration test_mtrebi_specific_N(unsigned long cnt)
 {
 	ThreadPool tp(nTest::thread_count);
+	tp.init();
 	queue<future<void>> que;
-	return nTool::calc_time([&]{
+	const auto dur(nTool::calc_time([&]{
 		while(cnt--)
 		{
 			for(auto i(nTest::thread_count);i--;)
@@ -39,14 +40,17 @@ nTest::duration test_mtrebi_specific_N(unsigned long cnt)
 				que.pop();
 			}
 		}
-	}).duration_nanoseconds();
+	}).duration_nanoseconds());
+	tp.shutdown();
+	return dur;
 }
 
 nTest::duration test_mtrebi_job(unsigned long cnt)
 {
 	ThreadPool tp(nTest::thread_count);
+	tp.init();
 	queue<future<void>> que;
-	return nTool::calc_time([&]{
+	const auto dur(nTool::calc_time([&]{
 		while(cnt--)
 			que.emplace(tp.submit(nTest::empty));
 		while(que.size())
@@ -54,5 +58,6 @@ nTest::duration test_mtrebi_job(unsigned long cnt)
 			que.front().get();
 			que.pop();
 		}
-	}).duration_nanoseconds();
+	}).duration_nanoseconds());
+	return dur;
 }
