@@ -59,5 +59,6 @@ nTest::duration test_mtrebi_job(unsigned long cnt)
 			que.pop();
 		}
 	}).duration_nanoseconds());
+	tp.shutdown();
 	return dur;
 }
